@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>quiz</title>
+    <style>
+
+      p {
+        color: white;
+      }
+
+      img {
+        width: 400px;
+        height: 250px;
+      }
+
+      button {
+        border: 3px solid;
+        outline: 0;
+        display: inline-block;
+        padding: 8px;
+        color: white;
+        background-color: #000;
+        cursor: pointer;
+        width: 60%;
+        font-size: 18px;
+      }
+
+      button:hover {
+        color: blue;
+      }
+
+      body {
+        width: 600px;
+        background-color: black;
+      }
+
+      div {
+        text-align: center;
+      }
+
+      div.testChoice {
+        width : 80%;
+        border: 5px solid white;
+        margin:0 auto;
+      }
+
+      div.testTop {
+        width : 80%;
+        height: 300px;
+        border: 5px solid white;
+        margin:0 auto;
+        padding: 5px;
+      }
+
+      div.testdown {
+        width : 80%;
+        height: 100px;
+        border: 5px solid white;
+        margin:0 auto;
+      }
+
+      button.testChoice {
+        width: 40%;
+        margin: 20px;
+      }
+
+      h1 {
+        color: white;
+        display: inline-block;
+      }
+
+      div.end {
+        width : 80%;
+        height: 600px;
+        border: 5px solid white;
+        margin:0 auto;
+        padding: 5px;
+      }
+
+    </style>
+  </head>
+
+  <body>
+    <div class="start">
+      <img  src="giphy.gif" width="550" height="400" id="pessstart">
+      <button id="btn001" type="button" name="button" onclick="startQuestion(10)">START 10 Q</button>
+      <button id="btn002" type="button" name="button" onclick="startQuestion(20)">START 20 Q</button>
+    </div>
+
+    <div class="testTop">
+      <img id="img" src="">
+      <p id="question">MMMM</p>
+    </div>
+
+    <div class="testChoice">
+      <button id="btn004" type="button" class="testChoice" name="button" onclick="checkA()">choice1</button>
+      <button id="btn005" type="button" class="testChoice" name="button" onclick="checkA()">choice2</button>
+      <button id="btn006" type="button" class="testChoice" name="button" onclick="checkA()">choice3</button>
+      <button id="btn007" type="button" class="testChoice" name="button" onclick="checkA()">choice4</button>
+    </div>
+
+    <div class="testdown">
+      <h1>Time: </h1>
+      <h1 id="time"></h1>
+    </div>
+
+    <div class="end">
+      <h1></h1>
+      <h1></h1>
+      <h1></h1>
+      <h1 id="score">Score</h1>
+    </div>
+
+    <script src="jquery-3.3.1.min.js" charset="utf-8"></script>
+    <script>
+      var list;
+      var randomNum;
+      var line = 8;
+      var index;
+      var totalAns = 0;
+      var selected;
+      var answer;
+      var time = 0;
+      var t=10;
+
+      $(".testTop").hide();
+      $(".testChoice").hide();
+      $(".testdown").hide();
+      $(".end").hide();
+
+      $(document).ready(function(){
+          $.ajax({
+          url: 'udata.json',
+          method: 'GET',
+          dataType:'json',
+          success: function(response){
+              console.log(response[1]);
+              list=response;
+          }
+          }) ;
+      });
+
+      function startQuestion(value) {
+        line = value;
+        $(".start").hide();
+        $(".testTop").show();
+        $(".testChoice").show();
+        $(".testdown").show();
+        showChoice();
+        timemer();
+      }
+
+      function showChoice() {
+        random();
+        $("#question").text(list[index]['Question']);
+        $("#btn004").text(list[index]['c1']);
+        $("#btn005").text(list[index]['c2']);
+        $("#btn006").text(list[index]['c3']);
+        $("#btn007").text(list[index]['c4']);
+        document.getElementById("img").src=list[index]["img"];
+        answer = list[index]["ans"];
+        list.splice (index,1);
+        t = 10;
+      }
+
+      function random() {
+        line = line - 1;
+        index = Math.floor((Math.random() * line));
+      }
+
+      function checkA() {
+        selected = document.getElementById(window.event.target.id).textContent;
+        console.log(selected);
+        console.log(answer);
+        if (selected == answer){
+          totalAns = totalAns + 1;
+        }
+        if (line==0) {
+          console.log(totalAns);
+          $(".testTop").hide();
+          $(".testChoice").hide();
+          $(".testdown").hide();
+          $(".end").show();
+          $("#score").text("Score: " + totalAns);
+
+        }
+        showChoice();
+      }
+      function timemer(){
+          t = 10;
+          time = setInterval(function() {
+                document.getElementById("time").innerHTML = t;
+                t = t - 1;
+                if (t == -1){
+                    time = time+t;
+                      showChoice();
+                    t = 10;
+                }
+                if (line==-1) {
+                  console.log(totalAns);
+                  $(".testTop").hide();
+                  $(".testChoice").hide();
+                  $(".testdown").hide();
+                  $(".end").show();
+                  $("#score").text("Score: " + totalAns);
+
+                }
+            }, 1000);
+
+      }
+    </script>
+  </body>
+</html>
